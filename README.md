@@ -44,3 +44,9 @@ For detailed documentation and more examples, please refer to the example.pdf fi
 
 Copyright 2025-- Yosuke Yamazaki  
 Released under the LaTeX Project Public License 1.3 or later
+
+## Support This Research
+
+This software is freely available for all uses, including commercial applications. 
+If you find it valuable for your work or organization, please consider supporting 
+our continued research in oral health and dental informatics.
