@@ -47,6 +47,9 @@ Released under the LaTeX Project Public License 1.3 or later
 
 ## Support This Research
 
+This dental notation typesetting LaTeX macro was developed by Dr. Yamazaki at Nihon University School of Dentistry
+as part of ongoing research in oral health and dental informatics. 
+
 This software is freely available for all uses, including commercial applications. 
-If you find it valuable for your work or organization, please consider supporting 
-our continued research in oral health and dental informatics.
+If you find it valuable for your work or publishing, please consider supporting 
+our continued research.
