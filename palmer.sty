@@ -1,0 +1,306 @@
+%% palmer.sty
+%% Copyright 2025 Yosuke Yamazaki
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in
+%   https://www.latex-project.org/lppl.txt
+% and version 1.3c or later is part of all distributions of LaTeX
+% version 2008 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+% 
+% The Current Maintainer of this work is Yosuke Yamazaki.
+%
+% This work consists of the files palmer.sty and example.pdf.
+
+% Load required packages
+\RequirePackage{tikz}
+\RequirePackage{expl3}
+
+% Initialize expl3 syntax
+\ExplSyntaxOn
+
+% Define string reverse function
+\cs_new:Npn \reverse_str:n #1 {
+  \tl_reverse:n { #1 }
+}
+
+% LaTeX 2e interface
+\cs_new_eq:NN \reversestr \reverse_str:n
+
+\ExplSyntaxOff
+
+% Define boxes and lengths
+\newsavebox{\ULbox}
+\newsavebox{\URbox}
+\newsavebox{\LRbox}
+\newsavebox{\LLbox}
+\newlength{\leftmaxlen}% Maximum width of left quadrants
+\newlength{\rightmaxlen}% Maximum width of right quadrants
+\newcommand{\hsepsetting}{0.3em}% Horizontal separation from center
+\newcommand{\vsepsetting}{0.7em}% Vertical separation from center
+\newcommand{\vbaselineoffset}{-0.35em}% Vertical offset for midline characters
+\newcommand{\crossextsetting}{0.3em}% Extension of cross bars beyond text
+
+\newcommand{\Palmer}[7][base]{%
+\leavevmode% Force inline mode
+\hbox{% Force horizontal mode explicitly
+\def\ULempty{0}% 1=empty, 0=non-empty
+\def\URempty{0}% 1=empty, 0=non-empty
+\def\LRempty{0}% 1=empty, 0=non-empty
+\def\LLempty{0}% 1=empty, 0=non-empty
+\def\tmpa{#2}\ifx\tmpa\empty\def\ULempty{1}\fi%
+\def\tmpa{#3}\ifx\tmpa\empty\def\URempty{1}\fi%
+\def\tmpa{#4}\ifx\tmpa\empty\def\LRempty{1}\fi%
+\def\tmpa{#5}\ifx\tmpa\empty\def\LLempty{1}\fi%
+% Define variables
+\def\drawleft{1}% 1=draw, 0=don't draw
+\def\drawright{1}%
+\def\drawupper{1}%
+\def\drawlower{1}%
+\def\baselineshift{0em}% Baseline shift amount
+% Check for novert option in 6th or 7th argument
+\def\novertflag{0}% 0=draw vertical lines, 1=don't draw
+\def\optnovert{novert}%
+\def\tmpa{#6}\ifx\tmpa\optnovert\def\novertflag{1}\fi%
+\def\tmpa{#7}\ifx\tmpa\optnovert\def\novertflag{1}\fi%
+% Determine drawing pattern
+%   If all 4 quadrants are empty, set all drawing flags to 0
+\ifnum\ULempty=1
+  \ifnum\URempty=1
+    \ifnum\LRempty=1
+      \ifnum\LLempty=1
+        \def\drawleft{0}\def\drawright{0}%
+        \def\drawupper{0}\def\drawlower{0}%
+        \def\ptype{0}%
+      \fi
+    \fi
+  \fi
+\fi
+% 1 quadrant only: Upper Left
+\ifnum\ULempty=0
+  \ifnum\URempty=1
+    \ifnum\LRempty=1
+      \ifnum\LLempty=1
+        \def\drawright{0}\def\drawlower{0}%
+        \def\ptype{1}% Upper pattern
+      \fi
+    \fi
+  \fi
+\fi
+% 1 quadrant only: Upper Right
+\ifnum\ULempty=1
+  \ifnum\URempty=0
+    \ifnum\LRempty=1
+      \ifnum\LLempty=1
+        \def\drawleft{0}\def\drawlower{0}%
+        \def\ptype{1}% Upper pattern
+      \fi
+    \fi
+  \fi
+\fi
+% 1 quadrant only: Lower Right
+\ifnum\ULempty=1
+  \ifnum\URempty=1
+    \ifnum\LRempty=0
+      \ifnum\LLempty=1
+        \def\drawleft{0}\def\drawupper{0}%
+        \def\ptype{2}% Lower pattern
+      \fi
+    \fi
+  \fi
+\fi
+% 1 quadrant only: Lower Left
+\ifnum\ULempty=1
+  \ifnum\URempty=1
+    \ifnum\LRempty=1
+      \ifnum\LLempty=0
+        \def\drawright{0}\def\drawupper{0}%
+        \def\ptype{2}% Lower pattern
+      \fi
+    \fi
+  \fi
+\fi
+% 2 quadrants: Upper
+\ifnum\ULempty=0
+  \ifnum\URempty=0
+    \ifnum\LRempty=1
+      \ifnum\LLempty=1
+        \def\drawlower{0}%
+        \def\ptype{1}% Upper pattern
+      \fi
+    \fi
+  \fi
+\fi
+% 2 quadrants: Lower
+\ifnum\ULempty=1
+  \ifnum\URempty=1
+    \ifnum\LRempty=0
+      \ifnum\LLempty=0
+        \def\drawupper{0}%
+        \def\ptype{2}% Lower pattern
+      \fi
+    \fi
+  \fi
+\fi
+% 2 quadrants: Left
+\ifnum\ULempty=0
+  \ifnum\URempty=1
+    \ifnum\LRempty=1
+      \ifnum\LLempty=0
+        \def\drawright{0}%
+        \def\ptype{3}% Left/Right/Other pattern
+      \fi
+    \fi
+  \fi
+\fi
+% 2 quadrants: Right
+\ifnum\ULempty=1
+  \ifnum\URempty=0
+    \ifnum\LRempty=0
+      \ifnum\LLempty=1
+        \def\drawleft{0}%
+        \def\ptype{3}% Left/Right/Other pattern
+      \fi
+    \fi
+  \fi
+\fi
+
+% Set default pattern type if not set above
+\ifdefined\ptype\else\def\ptype{3}\fi
+
+% Apply novert flag to disable vertical lines
+\ifnum\novertflag=1
+  \def\drawupper{0}%
+  \def\drawlower{0}%
+\fi
+
+% Set baseline shift based on option and pattern type
+\def\tmpa{#1}%
+\def\optcentre{centre}%
+\ifx\tmpa\optcentre\def\tmpa{center}\fi% Convert centre to center
+\def\optcenter{center}%
+\def\optbase{base}%
+\def\optbottom{bottom}%
+
+\ifnum\ptype=1
+  % Upper patterns
+  \ifx\tmpa\optcenter\def\baselineshift{0.3em}\fi
+  \ifx\tmpa\optbase\def\baselineshift{0.3em}\fi
+  \ifx\tmpa\optbottom\def\baselineshift{0em}\fi
+\else
+  \ifnum\ptype=2
+    % Lower patterns
+    \ifx\tmpa\optcenter\def\baselineshift{-1.0em}\fi
+    \ifx\tmpa\optbase\def\baselineshift{-1.0em}\fi
+    \ifx\tmpa\optbottom\def\baselineshift{-1.3em}\fi
+  \else
+    % Left/Right/Other patterns
+    \ifx\tmpa\optcenter\def\baselineshift{-0.3em}\fi
+    \ifx\tmpa\optbase\def\baselineshift{-1.0em}\fi
+    \ifx\tmpa\optbottom\def\baselineshift{-1.3em}\fi
+  \fi
+\fi
+
+% Store content in boxes in normal order
+\sbox{\ULbox}{#2}%
+\sbox{\URbox}{#3}%
+\sbox{\LRbox}{#4}%
+\sbox{\LLbox}{#5}%
+
+% Calculate maximum widths
+\ifdim\wd\ULbox>\wd\LLbox\relax
+  \setlength{\leftmaxlen}{\wd\ULbox}%
+\else
+  \setlength{\leftmaxlen}{\wd\LLbox}%
+\fi
+\ifdim\wd\URbox>\wd\LRbox\relax
+  \setlength{\rightmaxlen}{\wd\URbox}%
+\else
+  \setlength{\rightmaxlen}{\wd\LRbox}%
+\fi
+
+% TikZ drawing
+\tikz[baseline=\baselineshift]{%
+  \coordinate (center) at (0,0);
+  % Define offsets
+  \def\leftOffset{-\hsepsetting}%
+  \def\rightOffset{\hsepsetting}%
+  
+  % Adjust horizontal offsets if characters are present on bars
+  \def\adjustOffsets{0}%
+  \ifnum\drawupper=1
+    \def\tmpa{#6}\ifx\tmpa\empty\else
+      \def\optnovert{novert}%
+      \ifx\tmpa\optnovert\else
+        \def\adjustOffsets{1}%
+      \fi
+    \fi
+  \fi
+  \ifnum\drawlower=1
+    \def\tmpa{#7}\ifx\tmpa\empty\else
+      \def\optnovert{novert}%
+      \ifx\tmpa\optnovert\else
+        \def\adjustOffsets{1}%
+      \fi
+    \fi
+  \fi
+  
+  % Apply offset adjustment if needed
+  \ifnum\adjustOffsets=1
+    \def\leftOffset{-\hsepsetting - 0.3em}%
+    \def\rightOffset{\hsepsetting + 0.3em}%
+  \fi
+  
+  % Place text with potentially adjusted offsets
+  \ifnum\ULempty=0
+    % Automatically reverse the 2nd argument
+    \node[inner sep=0pt, outer sep=0pt, anchor=east] (ul) at (\leftOffset, \vsepsetting) {\reversestr{#2}};
+  \fi
+  \ifnum\URempty=0
+    \node[inner sep=0pt, outer sep=0pt, anchor=west] (ur) at (\rightOffset, \vsepsetting) {#3};
+  \fi
+  \ifnum\LRempty=0
+    \node[inner sep=0pt, outer sep=0pt, anchor=west] (lr) at (\rightOffset, -\vsepsetting) {#4};
+  \fi
+  \ifnum\LLempty=0
+    % Automatically reverse the 5th argument
+    \node[inner sep=0pt, outer sep=0pt, anchor=east] (ll) at (\leftOffset, -\vsepsetting) {\reversestr{#5}};
+  \fi
+  % Draw cross bars conditionally
+  % Adjust crossextsetting if vertical midline characters are present
+  \def\crossext{\crossextsetting}%
+  \ifnum\adjustOffsets=1
+    \def\crossext{0.6em}% Double the crossextsetting
+  \fi
+  \ifnum\drawleft=1
+    \draw (-\leftmaxlen - \hsepsetting - \crossext, 0) -- (0,0);
+  \fi
+  \ifnum\drawright=1
+    \draw (0, 0) -- (\rightmaxlen + \hsepsetting + \crossext, 0);
+  \fi
+  \ifnum\drawupper=1
+    \draw (0, \vsepsetting + 0.7em) -- (0, 0);
+    % Add character on upper vertical line if provided
+    \def\tmpa{#6}\ifx\tmpa\empty\else
+      \def\optnovert{novert}%
+      \ifx\tmpa\optnovert\else
+        \node[inner sep=0pt, outer sep=0pt, anchor=base] at (0, \vsepsetting + \vbaselineoffset) {#6};
+      \fi
+    \fi
+  \fi
+  \ifnum\drawlower=1
+    \draw (0, 0) -- (0, -\vsepsetting - 0.7em);
+    % Add character on lower vertical line if provided
+    \def\tmpa{#7}\ifx\tmpa\empty\else
+      \def\optnovert{novert}%
+      \ifx\tmpa\optnovert\else
+        \node[inner sep=0pt, outer sep=0pt, anchor=base] at (0, -\vsepsetting + \vbaselineoffset) {#7};
+      \fi
+    \fi
+  \fi
+}%
+}%
+}
