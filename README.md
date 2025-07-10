@@ -1,4 +1,4 @@
-# palmer.sty: Zsigmondy-Palmer Dental Notation Package in Latex
+# palmer.sty: Zsigmondy-Palmer Dental Notation Package in LaTeX
 
 A LaTeX package for representing Zsigmondy-Palmer dental notation using TikZ. This package allows dental professionals, educators, researchers, and publishing specialists to efficiently typeset typographically consistent and visually balanced dental notation in academic and clinical documents.
 
