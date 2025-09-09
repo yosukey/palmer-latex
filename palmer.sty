@@ -15,6 +15,8 @@
 %
 % This work consists of the files palmer.sty and example.pdf.
 
+\ProvidesPackage{palmer}[2025/09/09 v1.0.1 palmer.sty]
+
 % Load required packages
 \RequirePackage{tikz}
 \RequirePackage{expl3}
@@ -44,7 +46,7 @@
 \newcommand{\vbaselineoffset}{-0.35em}% Vertical offset for midline characters
 \newcommand{\crossextsetting}{0.3em}% Extension of cross bars beyond text
 
-\newcommand{\Palmer}[7][base]{%
+\DeclareRobustCommand{\Palmer}[7][base]{%
 \leavevmode% Force inline mode
 \hbox{% Force horizontal mode explicitly
 \def\ULempty{0}% 1=empty, 0=non-empty
@@ -55,6 +57,10 @@
 \def\tmpa{#3}\ifx\tmpa\empty\def\URempty{1}\fi%
 \def\tmpa{#4}\ifx\tmpa\empty\def\LRempty{1}\fi%
 \def\tmpa{#5}\ifx\tmpa\empty\def\LLempty{1}\fi%
+\ifnum\ULempty=1 \ifnum\URempty=1 \ifnum\LRempty=1 \ifnum\LLempty=1
+  \PackageError{palmer}{All four quadrant arguments are empty}%
+    {Provide at least one of UL/UR/LR/LL. If you intend blank space, insert a space.}%
+\fi\fi\fi\fi
 % Define variables
 \def\drawleft{1}% 1=draw, 0=don't draw
 \def\drawright{1}%
