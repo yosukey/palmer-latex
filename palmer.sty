@@ -15,7 +15,7 @@
 %
 % This work consists of the files palmer.sty and example.pdf.
 
-\ProvidesPackage{palmer}[2025/09/09 v1.0.1 palmer.sty]
+\ProvidesPackage{palmer}[2026/02/27 v1.0.2 palmer.sty]
 
 % Load required packages
 \RequirePackage{tikz}
@@ -229,7 +229,7 @@
 \fi
 
 % TikZ drawing
-\tikz[baseline=\baselineshift]{%
+\tikz[baseline=\baselineshift, line cap=rect, line width=0.04em]{%
   \coordinate (center) at (0,0);
   % Define offsets
   \def\leftOffset{-\hsepsetting}%
