@@ -48,6 +48,6 @@ This software is freely available for all uses, including commercial application
 If you find it valuable for your work or publishing, please consider supporting 
 our continued research.
 
-## Ackenowledgement
+## Acknowledgement
 
 This work was conducted with the support of JSPS KAKENHI Grant Number JP25K15395.
