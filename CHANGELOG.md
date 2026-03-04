@@ -2,6 +2,7 @@
 
 ### Changed
 - Add explicit `line cap=rect` and `line width=0.04em` options to the TikZ drawing environment for more consistent cross-bar rendering across TeX engines and font sizes.
+- Rewrote the example file (example.pdf). (2026-03-04)
 
 ## [1.0.1] - 2025-09-08
 
