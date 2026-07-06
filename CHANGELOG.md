@@ -1,4 +1,4 @@
-## [2.0.0] - 2026-05-08
+## [2.0.0] - 2026-07-07
 
 ### Added
 - `gap-ratio` option: uniformly scales the white space around the notation. Accepts a value in `[0, 1]` (`1` = default/maximum spacing, `0` = tightest); out-of-range values are clamped with a warning.
