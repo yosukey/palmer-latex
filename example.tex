@@ -1,0 +1,435 @@
+\documentclass[12pt]{ltjsarticle}
+\usepackage[top=20truemm,bottom=20truemm,left=20truemm,right=20truemm]{geometry}
+\usepackage{lipsum}
+\usepackage{wasysym}
+\usepackage{palmer}
+\usepackage{array}
+\usetikzlibrary{shapes.geometric}
+
+\begin{document}
+
+\title{The \texttt{palmer} package for drawing Zsigmondy-Palmer dental notation}
+\author{Yosuke Yamazaki\thanks{Dept.\ Anatomy, Nihon University School of Dentistry, Tokyo, Japan}}
+\date{July 7, 2026}
+
+\maketitle
+
+\section{Introduction}
+This document explains how to use the \texttt{palmer} package (v2.0.0), which is designed for typesetting the Zsigmondy-Palmer dental notation in \LaTeX. The package uses Ti\textit{k}Z to draw the notation.
+
+
+\section{Basic Usage}
+To use the \texttt{palmer} package, include the following command in the preamble:
+
+\begin{verbatim}
+\usepackage{palmer}
+\end{verbatim}
+
+Syntax:
+
+    \verb|\Palmer[<|\textit{options}\verb|>]{<|\textit{UL}\verb|>}{<|\textit{UR}\verb|>}{<|\textit{LR}\verb|>}{<|\textit{LL}\verb|>}{<|\textit{upper midline}\verb|>}{<|\textit{lower midline}\verb|>}|
+
+
+\subsection{First Argument (Options)}
+\label{sec:options}
+
+The first argument is optional and takes a comma-separated list of key--value settings. If it is omitted, all defaults apply. The available keys are:
+
+\begin{itemize}
+    \item \texttt{align} --- vertical alignment of the notation within a line of text: \texttt{base} (default), \texttt{center} (or \texttt{centre}), or \texttt{bottom}. See Section~\ref{sec:align}.
+    \item \texttt{gap-ratio} --- a number in the range $[0,1]$ that uniformly scales the white space around the notation. The default of \texttt{1} gives the maximum spacing, and \texttt{0} gives the tightest. See Section~\ref{sec:gap}.
+    \item \texttt{no-vert} --- suppresses the vertical (midline) bar. See Section~\ref{sec:novert}.
+    \item \texttt{no-reverse} --- displays the upper-left and lower-left quadrants in the input order instead of reversing them. See Section~\ref{sec:noreverse}.
+\end{itemize}
+
+Several settings may be combined, for example \verb|\Palmer[align=center, gap-ratio=0.5]{...}|. The Boolean options \texttt{no-vert} and \texttt{no-reverse} may be written on their own (as an abbreviation for \texttt{no-vert=true} and \texttt{no-reverse=true}). The same keys may also be set for the whole document with \verb|\palmerset| (Section~\ref{sec:palmerset}); settings given in the optional argument override the document-wide defaults for that call only.
+
+Alternatively, the same keys may be given as package options, which is equivalent to calling \verb|\palmerset| in the preamble:
+
+\begin{verbatim}
+\usepackage[align=center, gap-ratio=0.5]{palmer}
+\end{verbatim}
+
+\noindent Global options of the document class (such as paper size) are not inspected by the package.
+
+
+\subsection{Second to Fifth Arguments}
+
+These arguments specify the characters to be displayed in each quadrant: upper left (UL), upper right (UR), lower right (LR), and lower left (LL), respectively\footnote{Note that ``left'' and ``right'' here refer to the notation's visual representation, not the anatomical left and right of the jaw.}. If no character is to be displayed in a quadrant, leave the corresponding argument empty. However, an error will occur if all four quadrant arguments are empty.
+
+For the second (upper left) and fifth (lower left) arguments, characters should be entered from mesial to distal (in natural reading order). The macro automatically reverses this input to display the characters from distal to mesial, following standard dental charting conventions. This reversal can be disabled with the \texttt{no-reverse} option (Section~\ref{sec:noreverse}).
+
+The reversal moves the input one \emph{unit} at a time. A unit is a single character---including a multi-byte Unicode character such as ④, which is treated as one unit even with pdf\LaTeX---or a brace group \verb|{...}|, which is moved as a whole and whose contents are \emph{not} reversed. Consequently, a command that takes arguments (for example \verb|\hspace{1em}|) must not be placed bare in the UL or LL quadrants, because the command would be separated from its arguments; wrap the command together with its arguments in a brace group, as in \verb|{\hspace{1em}}3|. A bare command in these quadrants triggers a package warning to this effect. The same rule applies to a nested \verb|\Palmer|.
+
+This package is intended for use with numbers 1 to 8 and letters A to E. While other characters may work, they are not officially supported and could result in layout issues.
+
+
+\subsection{Sixth and Seventh Arguments}
+
+These arguments specify the characters to be displayed at the upper and lower midline positions, respectively. If no character is to be displayed, the argument may be left empty.
+
+The package is designed primarily for single characters at midline positions. Using multiple characters may cause layout problems.
+
+To suppress the vertical midline bar entirely, use the \texttt{no-vert} option in the first argument (Section~\ref{sec:novert}).\footnote{In earlier versions this was done by placing the keyword \texttt{novert} in the sixth or seventh argument; that keyword is no longer recognised in version~2.}
+
+
+\section{Examples}
+
+\subsection{Single Tooth or Single Quadrant Notation}
+The following examples illustrate how to denote individual teeth using the Zsigmondy-Palmer notation:
+
+\renewcommand{\arraystretch}{1.5}
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|l|c|}
+        \hline
+        Syntax & Result\\
+        \hline \hline
+        \verb|\Palmer{1}{}{}{}{}{}| & \Palmer{1}{}{}{}{}{} \\
+        \hline
+        \verb|\Palmer{}{C}{}{}{}{}| & \Palmer{}{C}{}{}{}{} \\
+        \hline
+        \verb|\Palmer{}{}{}{45}{}{}| & \Palmer{}{}{}{45}{}{} \\
+        \hline
+        \verb|\Palmer{}{}{1--3}{}{}{}| & \Palmer{}{}{1--3}{}{}{} \\
+        \hline
+    \end{tabular}
+\end{table}
+\renewcommand{\arraystretch}{1}
+
+
+\pagebreak %%%%%%%
+
+
+\subsection{Upper or Lower Jaw Representation}
+
+To represent either the upper or lower jaw, use the following syntax:
+
+\renewcommand{\arraystretch}{1.5}
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|l|c|}
+        \hline
+        Syntax & Result\\
+        \hline \hline
+        \verb|\Palmer{12}{12}{}{}{}{}| & \Palmer{12}{12}{}{}{}{} \\
+        \hline
+        \verb|\Palmer{}{}{45}{45}{}{}| & \Palmer{}{}{45}{45}{}{} \\
+        \hline
+        \verb|\Palmer{}{}{ABC}{{\kern3em}}{}{}| & \Palmer{}{}{ABC}{{\kern3em}}{}{} \\
+        \hline
+    \end{tabular}
+\end{table}
+\renewcommand{\arraystretch}{1}
+
+Note that \verb|\hspace| cannot be used \emph{bare} in the UL and LL quadrants, because these arguments are reversed unit by unit and the command would be separated from its argument (a package warning is issued in this case). Blank space can be created by wrapping the spacing command in a brace group, which is moved as a single unit, as \verb|{\kern3em}| in the third example; \verb|{\hspace{...}}| and \verb|{\phantom{...}}| work the same way. Alternatively, the \texttt{no-reverse} option (Section~\ref{sec:noreverse}) disables the reversal, after which \verb|\hspace| can be used directly in these quadrants.
+
+\vspace{2ex}
+
+To represent the upper and lower teeth on either the left or right side, use the following syntax:
+
+\renewcommand{\arraystretch}{2}
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|l|c|}
+        \hline
+        Syntax & Result\\
+        \hline \hline
+        \verb|\Palmer[align=center]{}{12}{34}{}{}{}| & \Palmer[align=center]{}{12}{34}{}{}{} \\
+        \hline
+        \verb|\Palmer[align=center]{4--6}{}{}{3--6}{}{}| & \Palmer[align=center]{4--6}{}{}{3--6}{}{} \\
+        \hline
+        \verb|\Palmer[align=center]{}{ }{3}{}{}{}| & \Palmer[align=center]{}{ }{3}{}{}{} \\
+        \hline
+    \end{tabular}
+\end{table}
+\renewcommand{\arraystretch}{1}
+In the third example, a space is used in the argument to create an empty quadrant.
+
+\subsection{Full-Mouth Representation}
+
+To represent the entire dentition:
+
+\renewcommand{\arraystretch}{2}
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|m{8.5cm}|c|}
+        \hline
+        Syntax & Result\\
+        \hline \hline
+        \verb|\Palmer[align=center]{4}{4}{5}{5}{}{}| & \Palmer[align=center]{4}{4}{5}{5}{}{} \\
+        \hline
+        \verb|\Palmer[align=center]{A}{}{A}{}{}{}| & \Palmer[align=center]{A}{}{A}{}{}{} \\
+        \hline
+        \verb|\Palmer[align=center]{6}{ }{ }{ }{}{}| & \Palmer[align=center]{6}{ }{ }{ }{}{} \\
+        \hline
+        \verb|\Palmer{{\phantom{1}}23}| \newline
+        \verb|{1{\phantom{2}}3}{{\phantom{1}}2}| \newline
+        \verb|{1{\phantom{23}}4}{}{}| & \Palmer{{\phantom{1}}23}{1{\phantom{2}}3}{{\phantom{1}}2}{1{\phantom{23}}4}{}{} \\
+        \hline
+    \end{tabular}
+\end{table}
+\renewcommand{\arraystretch}{1}
+
+As in previous examples, space can be reserved by inserting a blank space or by using a command such as \verb|\phantom{}|.
+
+\subsection{Upper or Lower Jaw Without Side Distinction}
+\label{sec:novert}
+
+To represent an upper or lower jaw without distinguishing left from right, use the \texttt{no-vert} option. This suppresses the vertical line.
+
+\renewcommand{\arraystretch}{1.5}
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|l|c|}
+        \hline
+        Syntax & Result\\
+        \hline \hline
+        \verb|\Palmer[no-vert]{3}{}{}{}{}{}| & \Palmer[no-vert]{3}{}{}{}{}{} \\
+        \hline
+        \verb|\Palmer[no-vert]{}{}{A}{}{}{}| & \Palmer[no-vert]{}{}{A}{}{}{} \\
+        \hline
+    \end{tabular}
+\end{table}
+\renewcommand{\arraystretch}{1}
+
+When using \texttt{no-vert} for the upper jaw, tooth characters can be entered in either the second argument (upper left quadrant) or the third argument (upper right quadrant). Similarly, for the lower jaw, they can be entered in either the fourth argument (lower right quadrant) or the fifth argument (lower left quadrant). Any midline arguments are ignored while \texttt{no-vert} is active.
+
+\subsection{Midline Symbol Placement}
+\label{sec:midsym}
+
+Symbols can be placed at the midline positions.
+
+\renewcommand{\arraystretch}{1.5}
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|l|c|}
+        \hline
+        Syntax & Result\\
+        \hline \hline
+        \verb|\Palmer{3}{3}{}{}{\textasciitilde}{}| & \Palmer{3}{3}{}{}{\textasciitilde}{} \\
+        \hline
+        \verb|\Palmer{}{}{1}{1}{}{\bigcirc}| & \Palmer{}{}{1}{1}{}{\bigcirc} \\
+        \hline
+    \end{tabular}
+\end{table}
+\renewcommand{\arraystretch}{1}
+
+In clinical practice in Japan, symbols are sometimes placed at the midline for patient records and dental charts. The following Unicode symbols can be used to achieve optimal results: △ (U+25B3), ◯ (U+25CB), ～ (U+301C).
+
+Note that such symbols require an engine and fonts that can typeset them. With a Unicode engine (Lua\LaTeX{} or Xe\LaTeX; this document is typeset with Lua\LaTeX) they work out of the box, whereas plain pdf\LaTeX{} will typically report the character as ``not set up for use with LaTeX'' unless additional declarations or fonts are loaded.
+
+\section{Additional Options}
+
+\subsection{Reversing Input Order: \texttt{no-reverse}}
+\label{sec:noreverse}
+
+By default, the upper-left and lower-left quadrants are displayed in reverse of the input order, so that characters entered from mesial to distal appear from distal to mesial. The \texttt{no-reverse} option disables this behaviour and displays the input as written. It affects only the UL and LL quadrants; the UR and LR quadrants are never reversed.
+
+\renewcommand{\arraystretch}{1.5}
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|l|c|}
+        \hline
+        Syntax & Result\\
+        \hline \hline
+        \verb|\Palmer{123}{}{}{}{}{}| & \Palmer{123}{}{}{}{}{} \\
+        \hline
+        \verb|\Palmer[no-reverse]{321}{}{}{}{}{}| & \Palmer[no-reverse]{321}{}{}{}{}{} \\
+        \hline
+        \verb|\Palmer[no-reverse]{\hspace{1em}3}{}{}{}{}{}| & \Palmer[no-reverse]{\hspace{1em}3}{}{}{}{}{} \\
+        \hline
+    \end{tabular}
+\end{table}
+\renewcommand{\arraystretch}{1}
+
+Because the reversal is disabled, spacing commands such as \verb|\hspace| can be used directly in the UL and LL quadrants, as shown in the third example.
+
+\subsection{Adjusting Spacing: \texttt{gap-ratio}}
+\label{sec:gap}
+
+The \texttt{gap-ratio} option scales the white space around the notation by a factor in the range $[0,1]$. The default value of \texttt{1} produces the standard (maximum) spacing, while smaller values tighten the notation. A value outside the range is clamped to the nearest bound, with a warning. The value is evaluated with \texttt{pgfmath}, so simple expressions such as \texttt{1/3} or \texttt{0.3*2} may also be given; the result is interpreted as a dimensionless number and then clamped to $[0,1]$.
+
+\renewcommand{\arraystretch}{2}
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|l|c|}
+        \hline
+        Syntax & Result\\
+        \hline \hline
+        \verb|\Palmer[align=center]{12}{12}{12}{12}{}{}| & \Palmer[align=center]{12}{12}{12}{12}{}{} \\
+        \hline
+        \verb|\Palmer[align=center, gap-ratio=0.5]{12}{12}{12}{12}{}{}| & \Palmer[align=center, gap-ratio=0.5]{12}{12}{12}{12}{}{} \\
+        \hline
+        \verb|\Palmer[align=center, gap-ratio=0]{12}{12}{12}{12}{}{}| & \Palmer[align=center, gap-ratio=0]{12}{12}{12}{12}{}{} \\
+        \hline
+    \end{tabular}
+\end{table}
+\renewcommand{\arraystretch}{1}
+
+The spacing scales with the current font size, so \texttt{gap-ratio} is useful for fine-tuning the appearance of the notation when it is set inline or at a non-default size.
+
+\subsection{Document-wide Settings: \texttt{\textbackslash palmerset}}
+\label{sec:palmerset}
+
+The \verb|\palmerset| command applies one or more of the options in Section~\ref{sec:options} to every subsequent \verb|\Palmer| call, so that common defaults need not be repeated:
+
+\begin{verbatim}
+\palmerset{align=center, gap-ratio=0.5}
+\end{verbatim}
+
+Options given in the optional argument of an individual \verb|\Palmer| call override these defaults for that call only. In the example below, the settings are made local to a group; the first two notations use the defaults established by \verb|\palmerset|, while the third overrides \texttt{gap-ratio}:
+
+\begin{verbatim}
+{% keep the effect local to this group
+  \palmerset{align=center, gap-ratio=0.5}
+  \Palmer{1}{1}{1}{1}{}{}\quad
+  \Palmer{2}{2}{2}{2}{}{}\quad
+  \Palmer[gap-ratio=1]{3}{3}{3}{3}{}{}% per-call override
+}
+\end{verbatim}
+
+\begin{quote}
+{% keep the effect local to this group
+  \palmerset{align=center, gap-ratio=0.5}%
+  \Palmer{1}{1}{1}{1}{}{}\quad
+  \Palmer{2}{2}{2}{2}{}{}\quad
+  \Palmer[gap-ratio=1]{3}{3}{3}{3}{}{}%
+}
+\end{quote}
+
+\noindent Because \verb|\palmerset| obeys \TeX's usual grouping rules, its effect lasts only until the end of the current group. To set defaults for the whole document, call it in the preamble (after \verb|\usepackage{palmer}|) or at the very beginning of the document body.
+
+\pagebreak %%%%%%%
+
+\section{Adjustment of Vertical Position in Inline Text}
+\label{sec:align}
+
+This section explains the \texttt{align} option of the \verb|\Palmer| command, which controls the vertical alignment of the notation within a line of text.
+
+The \texttt{palmer} package can typeset Zsigmondy-Palmer dental notation not only as standalone elements but also inline within running text. The vertical position options ensure proper alignment with the surrounding text. It is important to note that the vertical positioning of the dental notation can also affect the line spacing, especially for notations that span both the upper and lower jaws. If you wish to reduce the line spacing, using font size commands such as \verb|\small| or \verb|\tiny| for the notation will likely yield good results.
+
+
+
+\subsection{option: \texttt{align=base}}
+
+This is the default value. If notation spans both upper and lower jaws, the baseline of the lower jaw text is aligned with the line's baseline. For other cases, the baseline of the text within the notation is aligned with the line's baseline.
+
+\textbf{Example:}
+
+ \sbox0{
+    Lorem \Palmer[align=base]{1}{}{}{}{}{} ipsum \Palmer[align=base]{}{}{}{4}{}{} dolor \Palmer[align=base]{1}{1}{}{}{}{} sit \Palmer[align=base]{}{}{A}{A}{}{} amet, consectetur adipiscing elit.}
+ \noindent
+ \rlap{\color{red!80}\vrule width\wd0 height.15pt depth.15pt}%
+ \usebox0
+
+  \sbox0{
+ Ut \Palmer[align=base]{4}{}{}{4}{}{} purus \Palmer[align=base]{}{5}{5}{}{}{} elit \Palmer[align=base]{1}{1}{1}{1}{}{}, vestibulum ut, placerat ac, adipiscing vitae, felis.}
+ \noindent
+ \rlap{\color{red!80}\vrule width\wd0 height.15pt depth.15pt}%
+ \usebox0
+
+ \subsection{option: \texttt{align=center}}
+
+ \texttt{align=centre} is also accepted. If the notation spans both upper and lower jaws, the horizontal line of the notation is centered vertically with respect to the line of text (specifically, the mean line or the x-height). In other cases, this option behaves identically to the \texttt{align=base} option.
+
+ \textbf{Example:}
+
+ \sbox0{
+    Lorem \Palmer[align=center]{1}{}{}{}{}{} ipsum \Palmer[align=center]{}{}{}{4}{}{} dolor \Palmer[align=center]{1}{1}{}{}{}{} sit \Palmer[align=center]{}{}{A}{A}{}{} amet, consectetur adipiscing elit.}
+ \noindent
+ \rlap{\color{red!80}\vrule width\wd0 height.15pt depth.15pt}%
+ \usebox0
+
+ \sbox0{
+ Ut \Palmer[align=centre]{4}{}{}{4}{}{} purus \Palmer[align=center]{}{5}{5}{}{}{} elit \Palmer[align=center]{1}{1}{1}{1}{}{}, vestibulum ut, placerat ac, adipiscing vitae, felis.}
+ \noindent
+ \rlap{\color{red!80}\vrule width\wd0 height.15pt depth.15pt}%
+ \rlap{\color{blue!80}\vrule width\wd0 height\dimexpr0.5\fontcharht\font`X\relax depth\dimexpr-0.5\fontcharht\font`X+0.15pt\relax}%
+ \usebox0
+
+ \subsection{option: \texttt{align=bottom}}
+
+The bottom edge of the notation's bracket is aligned with the line's baseline. This applies to all notation types.
+
+\textbf{Example:}
+
+\sbox0{
+    Lorem \Palmer[align=bottom]{1}{}{}{}{}{} ipsum \Palmer[align=bottom]{}{}{}{4}{}{} dolor \Palmer[align=bottom]{1}{1}{}{}{}{} sit \Palmer[align=bottom]{}{}{A}{A}{}{} amet, consectetur adipiscing elit.}
+ \noindent
+ \rlap{\color{red!80}\vrule width\wd0 height.15pt depth.15pt}%
+ \usebox0
+
+ \sbox0{
+ Ut \Palmer[align=bottom]{4}{}{}{4}{}{} purus \Palmer[align=bottom]{}{5}{5}{}{}{} elit \Palmer[align=bottom]{1}{1}{1}{1}{}{}, vestibulum ut, placerat ac, adipiscing vitae, felis.}
+ \noindent
+ \rlap{\color{red!80}\vrule width\wd0 height.15pt depth.15pt}%
+ \usebox0
+
+ \section{Application Examples}
+
+ \renewcommand{\arraystretch}{1.5}
+ \begin{table}[ht]
+    \centering
+    \begin{tabular}{|m{8.5cm}|c|}
+        \hline
+        Syntax & Result\\
+        \hline \hline
+        \verb|\color{red} \Palmer{}{}{123}{123}{}{}| &  {\color{red} \Palmer{}{}{123}{123}{}{}} \\
+        \hline
+        \verb|\Palmer{}{}{④5⑥}{}{}{}| &  \Palmer{}{}{④5⑥}{}{}{} \\
+        \hline
+        \verb|\Palmer[align=center]| \newline
+        \verb|{3}{3}{1◯3}{12③}{～}{△}| & \Palmer[align=center]{3}{3}{1◯3}{12③}{～}{△} \\
+        \hline
+        \verb|{\LARGE \Palmer[align=center]| \newline
+        \verb|{123}{123}{123}{123}{}{}}| & {\LARGE \Palmer[align=center]{123}{123}{123}{123}{}{}} \\
+        \hline
+    \end{tabular}
+\end{table}
+\renewcommand{\arraystretch}{1}
+
+
+Symbols enclosed in circles, commonly used in clinical practice in Japan, can be effectively represented using the following symbols: ① (U+2461) or Ⓐ (U+24B6). These symbols can be used in any quadrant, including the reversed UL and LL quadrants, where each multi-byte character is moved as a single unit (subject to the same engine and font requirements as noted in Section~\ref{sec:midsym}).
+
+Alternatively, they can also be drawn using Ti\textit{k}Z, as shown in the table below.
+
+\renewcommand{\arraystretch}{1.1}
+\begin{table}[ht]
+   \centering
+   \begin{tabular}{|m{10cm}|c|}
+       \hline
+       Syntax & Result\\
+       \hline \hline
+       \verb|\tikz[baseline=(char.south)]| \newline \verb|\node[shape=circle,draw,inner sep=0.7pt]| \newline \verb|(char) {{\scriptsize 1}};| & \tikz[baseline=(char.south)] \node[shape=circle,draw,inner sep=0.7pt] (char) {{\scriptsize 1}}; \\
+       \hline
+       \verb|\tikz[baseline=(char.south)]| \newline \verb|\node[draw, shape=circle, double,| \newline \verb|inner sep=1pt] (char) {{\scriptsize 6}};| & \tikz[baseline=(char.south)] \node[draw, shape=circle, double, inner sep=1pt] (char) {{\scriptsize 6}}; \\
+       \hline
+       \verb|\tikz[baseline=(char.south)]| \newline \verb|\node[shape=regular polygon, regular polygon| \newline \verb|sides=3,draw,inner sep=0.1pt]| \newline \verb|(char) {{\scriptsize 3}};| & \tikz[baseline=(char.south)] \node[shape=regular polygon, regular polygon sides=3,draw,inner sep=0.1pt] (char) {{\scriptsize 3}}; \\
+       \hline
+   \end{tabular}
+\end{table}
+\renewcommand{\arraystretch}{1}
+
+\subsection{Use in Section Headings}
+
+The \verb|\Palmer| command can be used in section headings. However, when using the \texttt{hyperref} package, PDF bookmarks cannot contain TikZ drawings. Use \verb|\texorpdfstring| to provide a plain-text alternative for the bookmark:
+
+\begin{verbatim}
+\section{\texorpdfstring{\Palmer{}{1}{}{}{}{}}{Maxillary left central incisor}}
+\end{verbatim}
+
+The first argument is used for typesetting in the document, and the second is used for the PDF bookmark string.
+
+
+ \section{Important Note on Package Loading Order}
+
+ The \texttt{palmer} package relies on Ti\textit{k}Z to draw its graphical elements. The Ti\textit{k}Z package is powerful and interacts with \LaTeX's low-level page building mechanism, known as the shipout routine.
+
+Other \LaTeX packages that also modify the page layout—for example, to add watermarks, background images, or marginalia—may interact with this same mechanism. The order in which these packages are loaded determines the final behavior of the page layout.
+
+If you use \texttt{palmer} alongside another package that performs complex modifications to the page layout, a conflict may arise depending on the loading order.
+
+For instance, when using the \texttt{thumbs} package to create thumb indexes, \texttt{palmer} must be loaded after it. 
+
+\end{document}
