@@ -15,7 +15,7 @@
 %
 % This work consists of the files palmer.sty, example.tex, and example.pdf.
 
-\NeedsTeXFormat{LaTeX2e}[2022/06/01]
+\NeedsTeXFormat{LaTeX2e}[2020/10/01]
 \ProvidesPackage{palmer}[2026/07/06 v2.0.0 Zsigmondy-Palmer dental notation]
 
 \RequirePackage{tikz}
@@ -249,17 +249,24 @@
 % options of the document class, so e.g. a4paper/12pt cannot leak in here.
 % A Boolean option given without a value arrives as an empty #1; forward it
 % bare so that the pgfkeys-side `.default' (true) applies.
-\newcommand{\palmer@optbool}[2]{%
-  \def\palmer@tmp{#2}%
-  \ifx\palmer@tmp\@empty\palmerset{#1}\else\palmerset{#1=#2}\fi
-}
-\DeclareKeys[palmer]{
-  align.code      = {\palmerset{align=#1}},
-  gap-ratio.code  = {\palmerset{gap-ratio=#1}},
-  no-vert.code    = {\palmer@optbool{no-vert}{#1}},
-  no-reverse.code = {\palmer@optbool{no-reverse}{#1}},
-}
-\ProcessKeyOptions[palmer]
+% \DeclareKeys/\ProcessKeyOptions need LaTeX >= 2022-06-01; older kernels
+% fall back to \DeclareOption*, which likewise ignores global class options.
+\ifdefined\DeclareKeys
+  \newcommand{\palmer@optbool}[2]{%
+    \def\palmer@tmp{#2}%
+    \ifx\palmer@tmp\@empty\palmerset{#1}\else\palmerset{#1=#2}\fi
+  }
+  \DeclareKeys[palmer]{
+    align.code      = {\palmerset{align=#1}},
+    gap-ratio.code  = {\palmerset{gap-ratio=#1}},
+    no-vert.code    = {\palmer@optbool{no-vert}{#1}},
+    no-reverse.code = {\palmer@optbool{no-reverse}{#1}},
+  }
+  \ProcessKeyOptions[palmer]
+\else
+  \DeclareOption*{\expandafter\palmerset\expandafter{\CurrentOption}}
+  \ProcessOptions\relax
+\fi
 
 % Main user command.
 %
