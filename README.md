@@ -1,14 +1,9 @@
-# palmer.sty: Zsigmondy-Palmer Dental Notation Package in LaTeX
+# dental-palmer
 
 A LaTeX package for representing Zsigmondy-Palmer dental notation using TikZ. This package allows dental professionals, educators, researchers, and publishing specialists to efficiently typeset typographically consistent and visually balanced dental notation in academic and clinical documents.
 
-## Overview
-
-The palmer package provides a simple syntax for creating dental notation diagrams that follow the Zsigmondy-Palmer system.
-
-## Installation
-
-Place the file in the working directory or in the LaTeX installation path, and include the following command in the preamble:
+The CTAN distribution is named `dental-palmer`, while the LaTeX package is
+provided as `palmer.sty` and is loaded with:
 
 ```
 \usepackage{palmer}
@@ -78,11 +73,12 @@ Version 2 introduces a key–value interface for the optional argument. When upg
 - **New `no-reverse` option** for disabling the automatic reversal of the left quadrants.
 - **New `\palmerset` command** for setting options for a whole document.
 
-For detailed documentation and more examples, please refer to the example.pdf file included in this repository.
+For detailed documentation and more examples, please refer to the dental-palmer-doc.pdf file included in this repository.
 
 ## License
 
-Copyright 2026-- Yosuke Yamazaki  
+Copyright 2025-2026 Yosuke Yamazaki
+
 Released under the LaTeX Project Public License 1.3 or later
 
 ## Support This Research
