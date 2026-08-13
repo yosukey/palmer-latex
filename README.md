@@ -1,5 +1,9 @@
 # dental-palmer
 
+[![CTAN](https://img.shields.io/ctan/v/dental-palmer)](https://ctan.org/pkg/dental-palmer)
+[![License](https://img.shields.io/ctan/l/dental-palmer)](LICENSE)
+[![Last commit](https://img.shields.io/github/last-commit/yosukey/palmer-latex)](https://github.com/yosukey/palmer-latex/commits/main)
+
 A LaTeX package for representing Zsigmondy-Palmer dental notation using TikZ. This package allows dental professionals, educators, researchers, and publishing specialists to efficiently typeset typographically consistent and visually balanced dental notation in academic and clinical documents.
 
 The CTAN distribution is named `dental-palmer`, while the LaTeX package is
